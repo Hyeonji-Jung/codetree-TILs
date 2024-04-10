@@ -20,13 +20,15 @@ def move(idx, man):
     for i in range(4):
         nx = man[0] + dxs[i]
         ny = man[1] + dys[i]
-        if nx == conv[idx][0] - 1 and ny == conv[idx][1] - 1:
-            arrived[idx] = True
-            arrived_cnt += 1
-            return nx, ny
-        elif 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
-            q.append((nx, ny, i, 1))
-            visited[nx][ny] = True
+        if 0 <= nx < N and 0 <= ny < N:
+            if nx == conv[idx][0] - 1 and ny == conv[idx][1] - 1:
+                # print(f"{idx+1}번 사람 도착")
+                arrived[idx] = True
+                arrived_cnt += 1
+                return nx, ny
+            elif grid[nx][ny] >= 0:
+                q.append((nx, ny, i, 1))
+                visited[nx][ny] = True
 
     min_dirs = []
     min_dist = 10000
@@ -90,6 +92,7 @@ def find_near_conv(con):
             ):
                 q.append((nx, ny, d + 1))
                 visited[nx][ny] = True
+
     bases.sort(key=lambda x: (x[0], x[1]))
     return bases[0]
 
@@ -116,13 +119,14 @@ while True:
             if x != -1 and y != -1:
                 cantmove.append((x, y))
 
+    for c in cantmove:
+        grid[c[0]][c[1]] = -1
+
     # 3. t <= m일 때 t번 사람이 베이스캠프로 이동, 이후 단계부터는 해당 베이스캠프 칸을 지나갈 수 없음
     if t <= M:
+        # print(f"{t}번 사람 등장")
         base = find_near_conv(conv[t - 1])
         men.append(base)
         grid[base[0]][base[1]] = -1
-
-    for c in cantmove:
-        grid[c[0]][c[1]] = -1
 
 print(t)

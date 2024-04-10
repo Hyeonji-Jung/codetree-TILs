@@ -13,7 +13,7 @@ t = 0
 
 # bfs로 편의점까지의 최단거리를 찾되, 맨 처음 출발 시 방향 플래그를 가지고 움직이기
 def move(idx, man):
-    global grid, men, arrived, arrived_cnt
+    global men, arrived, arrived_cnt
     q = deque([])
     visited = [[False] * N for _ in range(N)]
     visited[man[0]][man[1]] = True
@@ -22,26 +22,26 @@ def move(idx, man):
         ny = man[1] + dys[i]
         if 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
             if nx == conv[idx][0] - 1 and ny == conv[idx][1] - 1:
-                grid[nx][ny] = -1
                 arrived[idx] = True
                 arrived_cnt += 1
-                return
+                return nx, ny
             else:
-                q.append((nx, ny, i, 1))
+                q.append((nx, ny, i))
                 visited[nx][ny] = True
 
     while q:
-        x, y, dir, dist = q.popleft()
+        x, y, dir = q.popleft()
         if x == conv[idx][0] - 1 and y == conv[idx][1] - 1:
-            men[idx] = [man[0] + dxs[dir], man[1] + dys[dir]]
-            return
+            men[idx][0], men[idx][1] = man[0] + dxs[dir], man[1] + dys[dir]
+            break
 
         for i in range(4):
             nx = x + dxs[i]
             ny = y + dys[i]
             if 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
-                q.append((nx, ny, dir, dist + 1))
+                q.append((nx, ny, dir))
                 visited[nx][ny] = True
+    return -1, -1
 
 
 # bfs로 해당 편의점에서 가장 가까운 베이스캠프 찾은 후 해당 베이스캠프 좌표 반환
@@ -50,13 +50,11 @@ def find_near_conv(con):
     visited = [[False] * N for _ in range(N)]
     q.append((con[0] - 1, con[1] - 1))
     visited[con[0] - 1][con[1] - 1] = True
-    base = [0, 0]
 
     while q:
         x, y = q.popleft()
         if grid[x][y] == 1:
-            base = [x, y]
-            break
+            return [x, y]
 
         for i in range(4):
             nx = x + dxs[i]
@@ -64,7 +62,7 @@ def find_near_conv(con):
             if 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
                 q.append((nx, ny))
                 visited[nx][ny] = True
-    return base
+    return [0, 0]
 
 
 while True:
@@ -82,8 +80,13 @@ while True:
     # 1. 편의점을 향해 1칸 이동
     # 2. 편의점에 도착했는지 확인, 도착했다면 이후 단계부터는 해당 칸을 지나갈 수 없음
     for idx, m in enumerate(men):
+        cantmove = []
         if not arrived[idx]:
-            move(idx, m)
+            x, y = move(idx, m)
+            if x != -1 and y != -1:
+                cantmove.append((x, y))
+        for c in cantmove:
+            grid[c[0]][c[1]] = -1
 
     # 3. t <= m일 때 t번 사람이 베이스캠프로 이동, 이후 단계부터는 해당 베이스캠프 칸을 지나갈 수 없음
     if t <= M:

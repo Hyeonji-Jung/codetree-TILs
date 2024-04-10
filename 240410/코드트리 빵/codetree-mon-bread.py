@@ -25,14 +25,21 @@ def move(idx, man):
             arrived_cnt += 1
             return nx, ny
         elif 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
-            q.append((nx, ny, i))
+            q.append((nx, ny, i, 1))
             visited[nx][ny] = True
 
+    min_dirs = []
+    min_dist = 10000
     while q:
-        x, y, dir = q.popleft()
+        x, y, dir, dist = q.popleft()
         if x == conv[idx][0] - 1 and y == conv[idx][1] - 1:
-            men[idx][0], men[idx][1] = man[0] + dxs[dir], man[1] + dys[dir]
-            break
+            if dist < min_dist:
+                min_dist = dist
+                min_dirs = [dir]
+            elif dist == min_dirs:
+                min_dirs.append(dir)
+            else:
+                break
 
         for i in range(4):
             nx = x + dxs[i]
@@ -43,8 +50,11 @@ def move(idx, man):
                 and not visited[nx][ny]
                 and grid[nx][ny] >= 0
             ):
-                q.append((nx, ny, dir))
+                q.append((nx, ny, dir, dist + 1))
                 visited[nx][ny] = True
+
+    min_dirs.sort()
+    men[idx][0], men[idx][1] = man[0] + dxs[min_dirs[0]], man[1] + dys[min_dirs[0]]
     return -1, -1
 
 
@@ -52,13 +62,22 @@ def move(idx, man):
 def find_near_conv(con):
     q = deque([])
     visited = [[False] * N for _ in range(N)]
-    q.append((con[0] - 1, con[1] - 1))
+    q.append((con[0] - 1, con[1] - 1, 0))
     visited[con[0] - 1][con[1] - 1] = True
 
+    bases = []
+    min_dist = 10000
+
     while q:
-        x, y = q.popleft()
+        x, y, d = q.popleft()
         if grid[x][y] == 1:
-            return [x, y]
+            if d < min_dist:
+                min_dist = d
+                bases = [[x, y]]
+            elif d == min_dist:
+                bases.append([x, y])
+            else:
+                break
 
         for i in range(4):
             nx = x + dxs[i]
@@ -69,9 +88,10 @@ def find_near_conv(con):
                 and not visited[nx][ny]
                 and grid[nx][ny] >= 0
             ):
-                q.append((nx, ny))
+                q.append((nx, ny, d + 1))
                 visited[nx][ny] = True
-    return [0, 0]
+    bases.sort(key=lambda x: (x[0], x[1]))
+    return bases[0]
 
 
 while True:
@@ -87,13 +107,14 @@ while True:
             x, y = move(idx, m)
             if x != -1 and y != -1:
                 cantmove.append((x, y))
-    for c in cantmove:
-        grid[c[0]][c[1]] = -1
 
     # 3. t <= m일 때 t번 사람이 베이스캠프로 이동, 이후 단계부터는 해당 베이스캠프 칸을 지나갈 수 없음
     if t <= M:
         base = find_near_conv(conv[t - 1])
         men.append(base)
         grid[base[0]][base[1]] = -1
+
+    for c in cantmove:
+        grid[c[0]][c[1]] = -1
 
 print(t)

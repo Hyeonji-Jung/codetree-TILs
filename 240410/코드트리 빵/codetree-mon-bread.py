@@ -81,19 +81,20 @@ while True:
 
     # 1. 편의점을 향해 1칸 이동
     # 2. 편의점에 도착했는지 확인, 도착했다면 이후 단계부터는 해당 칸을 지나갈 수 없음
+    cantmove = []
     for idx, m in enumerate(men):
-        cantmove = []
         if not arrived[idx]:
             x, y = move(idx, m)
             if x != -1 and y != -1:
                 cantmove.append((x, y))
-        for c in cantmove:
-            grid[c[0]][c[1]] = -1
 
     # 3. t <= m일 때 t번 사람이 베이스캠프로 이동, 이후 단계부터는 해당 베이스캠프 칸을 지나갈 수 없음
     if t <= M:
         base = find_near_conv(conv[t - 1])
         men.append(base)
         grid[base[0]][base[1]] = -1
+
+    for c in cantmove:
+        grid[c[0]][c[1]] = -1
 
 print(t)

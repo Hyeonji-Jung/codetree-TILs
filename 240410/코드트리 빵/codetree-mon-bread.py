@@ -21,19 +21,20 @@ def move(idx, man):
         nx = man[0] + dxs[i]
         ny = man[1] + dys[i]
         if 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
-            q.append((nx, ny, i, 1))
-            visited[nx][ny] = True
+            if nx == conv[idx][0] - 1 and ny == conv[idx][1] - 1:
+                grid[nx][ny] = -1
+                arrived[idx] = True
+                arrived_cnt += 1
+                return
+            else:
+                q.append((nx, ny, i, 1))
+                visited[nx][ny] = True
 
     while q:
         x, y, dir, dist = q.popleft()
         if x == conv[idx][0] - 1 and y == conv[idx][1] - 1:
-            if dist == 1:
-                grid[x][y] = -1
-                arrived[idx] = True
-                arrived_cnt += 1
-            else:
-                men[idx] = [man[0] + dxs[dir], man[1] + dys[dir]]
-            break
+            men[idx] = [man[0] + dxs[dir], man[1] + dys[dir]]
+            return
 
         for i in range(4):
             nx = x + dxs[i]

@@ -20,14 +20,13 @@ def move(idx, man):
     for i in range(4):
         nx = man[0] + dxs[i]
         ny = man[1] + dys[i]
-        if 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
-            if nx == conv[idx][0] - 1 and ny == conv[idx][1] - 1:
-                arrived[idx] = True
-                arrived_cnt += 1
-                return nx, ny
-            else:
-                q.append((nx, ny, i))
-                visited[nx][ny] = True
+        if nx == conv[idx][0] - 1 and ny == conv[idx][1] - 1:
+            arrived[idx] = True
+            arrived_cnt += 1
+            return nx, ny
+        elif 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
+            q.append((nx, ny, i))
+            visited[nx][ny] = True
 
     while q:
         x, y, dir = q.popleft()
@@ -38,7 +37,12 @@ def move(idx, man):
         for i in range(4):
             nx = x + dxs[i]
             ny = y + dys[i]
-            if 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
+            if (
+                0 <= nx < N
+                and 0 <= ny < N
+                and not visited[nx][ny]
+                and grid[nx][ny] >= 0
+            ):
                 q.append((nx, ny, dir))
                 visited[nx][ny] = True
     return -1, -1
@@ -59,7 +63,12 @@ def find_near_conv(con):
         for i in range(4):
             nx = x + dxs[i]
             ny = y + dys[i]
-            if 0 <= nx < N and 0 <= ny < N and grid[nx][ny] >= 0:
+            if (
+                0 <= nx < N
+                and 0 <= ny < N
+                and not visited[nx][ny]
+                and grid[nx][ny] >= 0
+            ):
                 q.append((nx, ny))
                 visited[nx][ny] = True
     return [0, 0]
@@ -69,13 +78,6 @@ while True:
     if arrived_cnt == M:
         break
     t += 1
-
-    # print("------------------")
-    # for i in range(N):
-    #     print(*grid[i])
-    # for m in men:
-    #     print(*m)
-    # print("------------------")
 
     # 1. 편의점을 향해 1칸 이동
     # 2. 편의점에 도착했는지 확인, 도착했다면 이후 단계부터는 해당 칸을 지나갈 수 없음

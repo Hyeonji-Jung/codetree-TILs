@@ -65,7 +65,7 @@ def find_near_conv(con):
     q.append((con[0] - 1, con[1] - 1, 0))
     visited[con[0] - 1][con[1] - 1] = True
 
-    bases = []
+    bases = [[-1, -1]]
     min_dist = 10000
 
     while q:
@@ -95,6 +95,14 @@ def find_near_conv(con):
 
 
 while True:
+    # print("------------------")
+    # for i in range(N):
+    #     print(*grid[i])
+    # for m in men:
+    #     print(*m)
+    # print(*arrived)
+    # print("------------------")
+
     if arrived_cnt == M:
         break
     t += 1

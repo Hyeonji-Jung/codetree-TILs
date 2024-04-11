@@ -54,7 +54,7 @@ def push(idx, dir):
     # 이동시켰을 때 밀려나는 기사 있는지 찾기
     flag = True
     for i in range(N):
-        if i != idx and is_overlap(moved, knights[i]):
+        if i != idx and alive[i] and is_overlap(moved, knights[i]):
             if flag:
                 flag = push(i, dir)
             else:
@@ -105,7 +105,7 @@ for idx, dir in commands:
     flag = True
     pushed = []
     for i in range(N):
-        if i != idx and is_overlap(knights[idx], knights[i]):
+        if i != idx and alive[i] and is_overlap(knights[idx], knights[i]):
             if flag:
                 flag = push(i, dir)
             else:

@@ -34,7 +34,7 @@ def is_wall(k):
         if wall:
             break
         for j in range(k['c'], k['c'] + k['w']):
-            if board[i][j] == 2:
+            if i < 0 or i >= L or j < 0 or j >= L or board[i][j] == 2:
                 wall = True
                 break
     return wall

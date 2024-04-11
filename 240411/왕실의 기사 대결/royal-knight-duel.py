@@ -55,7 +55,10 @@ def push(idx, dir):
     flag = True
     for i in range(N):
         if i != idx and is_overlap(moved, knights[i]):
-            flag = push(i, dir)
+            if flag:
+                flag = push(i, dir)
+            else:
+                break
 
     if flag:
         pushed.append(idx)
@@ -103,13 +106,15 @@ for idx, dir in commands:
     pushed = []
     for i in range(N):
         if i != idx and is_overlap(knights[idx], knights[i]):
-            flag = push(i, dir)
+            if flag:
+                flag = push(i, dir)
+            else:
+                break
 
-    # 움직이는 게 가능한 상황이라면 기사들이 이동하고 데미지 입기
+    # 움직이는 게 가능한 상황이라면 기사들이 이동하고 데미지 입기, 움직일 수 없다면 움직이지 않기
     if flag:
         for i in pushed:
             move(i, dir)
-    # 벽이 있어서 움직일 수 없다면 움직이지 않기
     else:
         knights[idx]['r'], knights[idx]['c'] = tr, tc
 

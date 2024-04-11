@@ -42,10 +42,6 @@ def get_square():
 
 
 for _ in range(K):
-    # 모든 참가자가 탈출했다면 종료
-    if escape_cnt == M:
-        break
-
     # 아직 탈출하지 못한 참가자를 한 칸씩 움직이기
     # 상하좌우로 움직였을 때 출구까지의 최단거리가 가까워지면 이동, 움직일 수 없으면 움직이지 않기
     for m in range(M):
@@ -61,6 +57,10 @@ for _ in range(K):
                     escape[m] = True
                     escape_cnt += 1
                 break
+
+    # 모든 참가자가 탈출했다면 종료
+    if escape_cnt == M:
+        break
 
     # 정사각형 잡기: 한 명 이상의 참가자와 출구를 포함한 가장 작은 정사각형
     sx, sy, d = get_square()

@@ -13,37 +13,11 @@ turret = []
 broken = 0
 for i in range(N):
     for j in range(M):
-        if grid[i][j] == 0:
-            broken += 1
-        else:
+        if grid[i][j] > 0:
             turret.append((i, j))
+        else:
+            broken += 1
 no_repair = []
-
-
-def get_attacker():
-    attackers = []
-    min_power = 10000
-    for t in turret:
-        if grid[t[0]][t[1]] < min_power:
-            attackers = [t]
-            min_power = grid[t[0]][t[1]]
-        elif grid[t[0]][t[1]] == min_power:
-            attackers.append(t)
-    attackers.sort(key=lambda x: (-attack[x[0]][x[1]], -(x[0] + x[1]), -x[1]))
-    return attackers[0]
-
-
-def get_defender():
-    defenders = []
-    max_power = -1
-    for t in turret:
-        if grid[t[0]][t[1]] > max_power:
-            defenders = [t]
-            max_power = grid[t[0]][t[1]]
-        elif grid[t[0]][t[1]] == max_power:
-            defenders.append(t)
-    defenders.sort(key=lambda x: (attack[x[0]][x[1]], x[0] + x[1], x[1]))
-    return defenders[0]
 
 
 def laser(attacker, defender):
@@ -79,28 +53,27 @@ def bomb(attacker, defender):
     for i in range(8):
         nx = (defender[0] + dxs[i]) % N
         ny = (defender[1] + dys[i]) % M
-        if nx != attacker[0] and ny != attacker[1] and grid[nx][ny] > 0:
-            grid[nx][ny] -= grid[attacker[0]][attacker[1]] // 2
-            no_repair.append((nx, ny))
+        if nx == attacker[0] and ny == attacker[1]:
+            continue
+        grid[nx][ny] -= grid[attacker[0]][attacker[1]] // 2
+        no_repair.append((nx, ny))
 
 
 for k in range(1, K + 1):
-    # 1. 공격자 선정
-    attacker = get_attacker()
-    grid[attacker[0]][attacker[1]] += N + M
+    # 공격할 포탑, 공격받을 포탑 선정
+    turret.sort(key=lambda x: (grid[x[0]][x[1]], -attack[x[0]][x[1]], -(x[0] + x[1]), -x[1]))
+    attacker = turret[0]
+    defender = turret[-1]
     attack[attacker[0]][attacker[1]] = k
+    grid[attacker[0]][attacker[1]] += N + M
     no_repair.append(attacker)
-
-    # 2. 공격
-    # 2-1. 공격받을 포탑 선정
-    defender = get_defender()
     no_repair.append(defender)
 
-    # 2-3. 레이저 공격, 레이저 공격 실패 시 포탄 공격
+    # 레이저 공격, 레이저 공격 실패 시 포탄 공격
     if not laser(attacker, defender):
         bomb(attacker, defender)
 
-    # 3. 포탑 부서짐
+    # 포탑 부서짐
     broken = 0
     remains = []
     for i in range(N):

@@ -52,6 +52,15 @@ def loser_move(loser):
     players[loser]["x"], players[loser]["y"] = nx, ny
 
 
+def get_gun(player):
+    if guns[player] > 0:
+        grid[players[player]["x"]][players[player]["y"]].append(guns[player])
+        guns[player] = 0
+    if len(grid[players[player]["x"]][players[player]["y"]]) > 0:
+        grid[players[player]["x"]][players[player]["y"]].sort()
+        guns[player] = grid[players[player]["x"]][players[player]["y"]].pop()
+
+
 for k in range(K):
     # 플레이어 순차 이동
     for i in range(M):
@@ -65,6 +74,8 @@ for k in range(K):
                 and players[i]["x"] == players[j]["x"]
                 and players[i]["y"] == players[j]["y"]
             ):
+                # print(f"{j+1}번째 플레이어와 마주침: ", players[j])
+
                 fought = True
                 power_i = players[i]["s"] + guns[i]
                 power_j = players[j]["s"] + guns[j]
@@ -77,6 +88,10 @@ for k in range(K):
                     else (j, i)
                 )
 
+                # print(f"{i+1}번째 플레이어의 power: ", power_i)
+                # print(f"{j+1}번째 플레이어의 power: ", power_j)
+                # print(f"winner: {winner + 1}, {abs(power_i - power_j)}점 획득")
+
                 points[winner] += abs(power_i - power_j)
 
                 # 진 플레이어 총 내려놓고 이동 후 총 획득
@@ -84,31 +99,15 @@ for k in range(K):
                     grid[players[loser]["x"]][players[loser]["y"]].append(guns[loser])
                     guns[loser] = 0
                 loser_move(loser)
-                if len(grid[players[loser]["x"]][players[loser]["y"]]) > 0:
-                    grid[players[loser]["x"]][players[loser]["y"]].sort()
-                    guns[loser] = grid[players[loser]["x"]][players[loser]["y"]].pop()
+                get_gun(loser)
 
                 # 이긴 플레이어 총 획득
-                if guns[winner] > 0:
-                    grid[players[winner]["x"]][players[winner]["y"]].append(
-                        guns[winner]
-                    )
-                    guns[winner] = 0
-                if len(grid[players[winner]["x"]][players[winner]["y"]]) > 0:
-                    grid[players[winner]["x"]][players[winner]["y"]].sort()
-                    guns[winner] = grid[players[winner]["x"]][
-                        players[winner]["y"]
-                    ].pop()
+                get_gun(winner)
 
                 break
 
         if not fought:
-            if guns[i] > 0:
-                grid[players[i]["x"]][players[i]["y"]].append(guns[i])
-                guns[i] = 0
-            if len(grid[players[i]["x"]][players[i]["y"]]) > 0:
-                grid[players[i]["x"]][players[i]["y"]].sort()
-                guns[i] = grid[players[i]["x"]][players[i]["y"]].pop()
+            get_gun(i)
 
 
 print(*points)
